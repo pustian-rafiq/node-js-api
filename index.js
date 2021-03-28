@@ -52,6 +52,40 @@ app.post('/add-note', (req, res) => {
     res.send(notes);
 });
 
+// update a note
+app.put('/update-note/:noteId', (req, res) => {
+    const noteId = parseInt(req.params.noteId);
+    const noteInput = req.body;
+    const gotNoteInputKey = Object.keys(noteInput);
+    const allowedUpdates = ["title", "description"];
+    const isAllowed = gotNoteInputKey.every(update => allowedUpdates.includes(update));
+    if (!isAllowed) {
+        return res.status(400).send('Invalid Operation');
+    }
+    const note = notes.find(note => note.id === noteId);
+    if (note) {
+        //success update
+        notes = notes.map(note => {
+            if (note.id === noteId) {
+                return {
+                    ...note,
+                    ...noteInput
+                };
+            } else {
+                return note;
+            }
+        });
+        return res.send(notes);
+    } else {
+        //Deal with note that not found
+        return res.status(404).send('Note Not Found');
+
+    }
+    //Server Error
+    res.status(500).send('Internal server error!')
+})
+
+
 
 app.get('*', (req, res) => {
     res.status(404).send('404 Not Found');
