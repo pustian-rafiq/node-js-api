@@ -2,7 +2,8 @@
 const express = require('express');
 const app = express();
 
-
+// middleware
+app.use(express.json());
 let notes = [{
         id: 1,
         title: "Note title 1",
@@ -17,13 +18,13 @@ let notes = [{
 
 // create route
 app.get('/', (req, res) => {
-    res.send('I am form node js');
+    res.send('Welcome to node.js');
 });
 app.get('/test/:name', (req, res) => {
     const name = req.params.name;
     res.send(`Hello ${name}`);
 });
-//notes all notes
+//Get all notes
 app.get('/notes', (req, res) => {
     if (notes.length == 0) {
         return res.send("No note found or yet not created");
@@ -31,7 +32,7 @@ app.get('/notes', (req, res) => {
 
     res.send(notes);
 });
-//notes single note
+//Get single note
 app.get('/notes/:noteId', (req, res) => {
 
     const noteId = parseInt(req.params.noteId);
@@ -39,13 +40,21 @@ app.get('/notes/:noteId', (req, res) => {
     if (note) {
         res.send(note);
     } else {
-        res.send("Note not found");
+        res.status(404).send("Note not found");
     }
 
 });
 
+//Add a new note
+app.post('/add-note', (req, res) => {
+    const note = req.body;
+    notes = [...notes, note];
+    res.send(notes);
+});
+
+
 app.get('*', (req, res) => {
-    res.send('404 Not Found');
+    res.status(404).send('404 Not Found');
 });
 // create server
 app.listen(3000, () => {
