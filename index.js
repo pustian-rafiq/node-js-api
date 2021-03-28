@@ -58,32 +58,52 @@ app.put('/update-note/:noteId', (req, res) => {
     const noteInput = req.body;
     const gotNoteInputKey = Object.keys(noteInput);
     const allowedUpdates = ["title", "description"];
-    const isAllowed = gotNoteInputKey.every(update => allowedUpdates.includes(update));
-    if (!isAllowed) {
-        return res.status(400).send('Invalid Operation');
+    try {
+        const isAllowed = gotNoteInputKey.every(update => allowedUpdates.includes(update));
+        if (!isAllowed) {
+            return res.status(400).send('Invalid Operation');
+        }
+        const note = notes.find(note => note.id === noteId);
+        if (note) {
+            //success update
+            notes = notes.map(note => {
+                if (note.id === noteId) {
+                    return {
+                        ...note,
+                        ...noteInput
+                    };
+                } else {
+                    return note;
+                }
+            });
+            return res.send(notes);
+        } else {
+            //Deal with note that not found
+            return res.status(404).send('Note Not Found');
+
+        }
+    } catch (error) {
+        //Server Error
+        res.status(500).send('Internal server error!')
     }
+
+});
+
+// Delete Notes
+
+app.delete('/delete-note/:noteId', (req, res) => {
+    const noteId = parseInt(req.params.noteId);
+    //find the note
     const note = notes.find(note => note.id === noteId);
     if (note) {
-        //success update
-        notes = notes.map(note => {
-            if (note.id === noteId) {
-                return {
-                    ...note,
-                    ...noteInput
-                };
-            } else {
-                return note;
-            }
-        });
-        return res.send(notes);
+        //delete note
+        notes = notes.filter(note => note.id !== noteId);
+        res.send(notes);
     } else {
-        //Deal with note that not found
-        return res.status(404).send('Note Not Found');
-
+        // Note not found
+        res.status(404).send('Note not found or unable to update');
     }
-    //Server Error
-    res.status(500).send('Internal server error!')
-})
+});
 
 
 
