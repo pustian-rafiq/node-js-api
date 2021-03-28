@@ -7,8 +7,9 @@ const app = express();
 app.get('/', (req, res) => {
     res.send('I am form node js');
 });
-app.get('/test', (req, res) => {
-    res.send('I am form test js');
+app.get('/test/:name', (req, res) => {
+    const name = req.params.name;
+    res.send(`Hello ${name}`);
 });
 app.get('*', (req, res) => {
     res.send('404 Not Found');
