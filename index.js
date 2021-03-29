@@ -3,7 +3,9 @@ const express = require('express');
 const app = express();
 
 const mongoose = require('mongoose');
+// import model
 
+const Note = require('./models/notes');
 //connecting database
 mongoose.connect('mongodb://localhost/notes-app', { useNewUrlParser: true, useUnifiedTopology: true })
     .then(() => console.log('Databse created successfully'))
@@ -17,18 +19,6 @@ app.use(express.json());
  * PUT/PATCH - Update data - hit the url: /notes/:id 
  * DELETE - Delete data - hit the url: /notes/:id
  */
-
-let notes = [{
-        id: 1,
-        title: "Note title 1",
-        description: "Note description 1"
-    },
-    {
-        id: 2,
-        title: "Note title 2",
-        description: "Note description 2"
-    }
-]
 
 // create route
 app.get('/', (req, res) => {
@@ -60,11 +50,16 @@ app.get('/notes/:noteId', (req, res) => {
 });
 
 //Add a new note
-app.post('/add-note', (req, res) => {
-    const note = req.body;
-    notes = [...notes, note];
-    res.send(notes);
+app.post('/notes', async(req, res) => {
+    const note = new Note(req.body);
+    try {
+        await note.save();
+        res.send(note);
+    } catch (error) {
+        res.status(500).send('Something happend worng!');
+    }
 });
+
 
 // update a note
 app.put('/update-note/:noteId', (req, res) => {
