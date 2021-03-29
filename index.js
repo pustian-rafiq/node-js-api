@@ -2,8 +2,22 @@
 const express = require('express');
 const app = express();
 
-// middleware
+const mongoose = require('mongoose');
+
+//connecting database
+mongoose.connect('mongodb://localhost/notes-app', { useNewUrlParser: true, useUnifiedTopology: true })
+    .then(() => console.log('Databse created successfully'))
+    .catch((error) => console.log(error))
+    // middleware
 app.use(express.json());
+// REST API Structure
+/**
+ * GET - Read data - hit the url: /notes (Multiple Notes), notes/:id (single note)
+ * POST - Add Data - hit the url: /notes (Add note)
+ * PUT/PATCH - Update data - hit the url: /notes/:id 
+ * DELETE - Delete data - hit the url: /notes/:id
+ */
+
 let notes = [{
         id: 1,
         title: "Note title 1",
